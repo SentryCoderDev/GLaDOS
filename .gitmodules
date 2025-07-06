@@ -1,0 +1,4 @@
+[submodule "voice_ollama"]
+	path = voice_ollama
+	url = https://github.com/SentryCoderDev/GLaDOS_Voice.git
+	branch = ollama_server
