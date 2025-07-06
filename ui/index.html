@@ -1,0 +1,728 @@
+<!-- index.html (NİHAİ DÜZELTİLMİŞ VERSİYON) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLaDOS - Notice of Dismissal</title>
+    <style>
+        /* --- TEMEL STİLLER VE RENK PALETİ --- */
+        :root {
+            --color-bg: #35281E;
+            --color-fg: #DDC28A;
+            --color-fg-dim: #9E8C62;
+            --font-mono: 'Consolas', 'Courier New', monospace;
+            --portal-blue: #00AEEF;
+            --portal-orange: #FF6C00;
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-fg);
+            font-family: var(--font-mono);
+            font-size: 16px;
+            margin: 0; padding: 0;
+            overflow: hidden;
+        }
+
+        /* --- PARAZİT / SCANLINE EFEKTİ --- */
+        body::after {
+            content: " "; display: block; position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, #0000 0px, #0003 1px, #0004 2px);
+            z-index: 10; pointer-events: none; animation: scanline-flicker 0.15s infinite;
+        }
+        @keyframes scanline-flicker { 0% { opacity: 0.9; } 50% { opacity: 1; } 100% { opacity: 0.9; } }
+
+        /* --- ANA YERLEŞİM (LAYOUT) --- */
+        .screen {
+            box-sizing: border-box; position: absolute;
+            top: 20px; left: 20px; right: 20px; bottom: 20px;
+            border: 2px solid var(--color-fg-dim);
+            display: grid; grid-template-columns: 2.5fr 1fr;
+            gap: 20px; padding: 20px;
+        }
+
+        .lyrics-panel, .right-column { position: relative; }
+        pre { margin: 0; white-space: pre-wrap; font-family: var(--font-mono); }
+
+        /* --- SAĞ TARAF VE PANELLER --- */
+        .right-column { display: grid; grid-template-rows: 140px 1fr; gap: 20px; }
+        .info-panels {
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            height: auto; /* Diğer paneller kaldırıldığı için yükseklik ayarlandı */
+        }
+        .panel {
+            border: 1px solid var(--color-fg-dim);
+            padding: 10px; /* Daha fazla içerik için padding artırıldı */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, var(--portal-blue), var(--portal-orange));
+            animation: panel-glow 3s infinite alternate;
+        }
+        @keyframes panel-glow {
+            from {
+                box-shadow: 0 0 10px var(--portal-blue);
+            }
+            to {
+                box-shadow: 0 0 20px var(--portal-orange);
+            }
+        }
+        #matrix-panel {
+            font-size: 14px; /* Daha büyük font boyutu */
+            line-height: 1.5;
+            color: var(--color-fg-dim);
+            word-break: break-all;
+        }
+        #numbers-panel {
+            justify-content: flex-start;
+            padding-left: 15px;
+            text-align: left;
+        }
+
+        /* --- IP ADRESİ VE PORT GÖSTERİMİ --- */
+        #numbers-panel::before {
+            content: "IP: 192.168.1.1\nPort: 8080"; /* Örnek IP ve Port bilgisi */
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .credits-container { overflow: hidden; position: relative; }
+        #credits-panel { position: absolute; width: 100%; color: var(--color-fg-dim); will-change: transform; animation: scroll-up 120s linear infinite; }
+        
+        @keyframes scroll-up { from { transform: translateY(100%); } to { transform: translateY(-120%); } }
+
+        /* --- YENİ VE ÇALIŞAN APERTURE LOGOSU --- */
+        #logo {
+            font-size: 10px;
+            height: 20em;
+            width: 20em;
+            border-radius: 10em;
+            position: relative;
+            --triangle-size: 4em;
+            --triangle-skew: 15deg;
+            transition: 2s;
+            overflow: hidden;
+            animation: logo-spin 5s linear infinite, logo-hover-simulate 10s ease-in-out infinite;
+        }
+
+        @keyframes logo-spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes logo-hover-simulate {
+            0%, 80% {
+                --triangle-skew: 15deg;
+            }
+            85%, 95% {
+                --triangle-skew: 45deg;
+            }
+            100% {
+                --triangle-skew: 15deg;
+            }
+        }
+
+        #logo:hover {
+            transform: rotate(45deg);
+            --triangle-skew: 45deg;
+        }
+
+        #logo i {
+            position: absolute;
+            transform: rotate(-45deg);
+            top: 5.5em;
+            left: .5em;
+            transition: 2s;
+        }
+
+        #logo i::before {
+            content: "";
+            display: block;
+            width: 0;
+            height: 0;
+            border: var(--triangle-size) solid #000;
+            border-right: var(--triangle-size) solid transparent;
+            border-bottom: var(--triangle-size) solid transparent;
+            transform: skew(calc(var(--triangle-skew)*-1), var(--triangle-skew));
+            transition: 2s;
+        }
+
+        #logo > i {
+            top: 9.5em;
+            left: -0.5em;
+        }
+
+        /* --- PANEL DÜZENLEMELERİ --- */
+        #logo-panel {
+            width: 200px; /* Kare boyut */
+            height: 200px; /* Kare boyut */
+            margin: 0; /* Sağ üst köşeye taşındı */
+        }
+
+        /* Diğer panelleri kaldır */
+        #matrix-panel, #numbers-panel {
+            display: none;
+        }
+
+        /* --- YENİ UI ELEMENTLERİ --- */
+        .status-bar {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            background: #35281e;
+            color: var(--color-fg);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--color-fg-dim);
+        }
+
+        /* --- CPU VE DURUM KUTUSU DÜZENLEMESİ --- */
+        #status-container {
+            position: absolute;
+            bottom: 20px; /* Beyaz sınır çizgisine uygun mesafe */
+            right: 20px; /* Beyaz sınır çizgisine uygun mesafe */
+            width: 220px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8); /* Daha koyu arka plan */
+            border: 1px solid var(--color-fg-dim);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden; /* İçerik taşmasını önlemek için */
+            color: var(--color-fg); /* Yazı rengini kontrast için ayarla */
+        }
+
+        #cpu-bar-container {
+            display: none; /* CPU bar kaldırıldı */
+        }
+
+        #cpu-bar {
+            display: none; /* CPU bar kaldırıldı */
+        }
+
+        .status-item {
+            font-family: var(--font-mono);
+            font-size: 16px;
+            color: var(--color-fg); /* Yazıların okunabilirliğini artırmak için renk değiştirildi */
+            padding: 8px 0;
+            border-bottom: 1px solid var(--color-fg-dim);
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(255,140,0,0.1) 0%, rgba(255,69,0,0.05) 40%, rgba(0,0,0,0) 70%);
+            filter: blur(1px);
+            animation: water-surface 3s ease-in-out infinite alternate;
+            z-index: 1;
+        }
+
+        @keyframes water-surface {
+            0% {
+                transform: scale(1) translateY(0px);
+                filter: blur(0.5px);
+            }
+            25% {
+                transform: scale(1.002) translateY(-1px);
+                filter: blur(1px);
+            }
+            50% {
+                transform: scale(1.001) translateY(1px);
+                filter: blur(0.8px);
+            }
+            75% {
+                transform: scale(1.003) translateY(-0.5px);
+                filter: blur(1.2px);
+            }
+            100% {
+                transform: scale(1) translateY(0px);
+                filter: blur(0.7px);
+            }
+        }
+
+        .scanline {
+            position: absolute;
+            top: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, transparent 0%, #FF8C00 50%, transparent 100%);
+            box-shadow: 0 0 10px #FF8C00;
+            animation: scanline-move 8s linear infinite;
+            z-index: 2;
+        }
+
+        @keyframes scanline-move {
+            0% {
+                top: -5px;
+                opacity: 0;
+            }
+            5% {
+                opacity: 1;
+            }
+            95% {
+                opacity: 1;
+            }
+            100% {
+                top: 100vh;
+                opacity: 0;
+            }
+        }
+
+        /* --- YENİ PORTAL ELEMENTLERİ --- */
+        /* Data stream paneli kaldırıldı */
+
+        .chamber-status {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            width: 220px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--color-fg-dim);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--color-fg);
+        }
+
+        .status-item-chamber {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-indicator {
+            color: #00FF00;
+            animation: blink 2s infinite;
+        }
+
+        .status-warning {
+            color: #FF6C00;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .subject-info {
+            position: absolute;
+            bottom: 65px;
+            right: 270px;
+            width: 220px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid var(--color-fg-dim);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--color-fg);
+        }
+
+        .glitch {
+            animation: glitch-effect 10s infinite;
+        }
+
+        @keyframes glitch-effect {
+            0%, 90% { 
+                transform: translateX(0);
+                filter: hue-rotate(0deg);
+            }
+            91% { 
+                transform: translateX(-2px);
+                filter: hue-rotate(90deg);
+            }
+            92% { 
+                transform: translateX(2px);
+                filter: hue-rotate(180deg);
+            }
+            93% { 
+                transform: translateX(-1px);
+                filter: hue-rotate(270deg);
+            }
+            94%, 100% { 
+                transform: translateX(0);
+                filter: hue-rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanline"></div>
+    
+    <!-- Audio element for sleep mode music -->
+    <audio id="sleep-music" loop preload="auto">
+        <source src="want_you_gone.mp3" type="audio/mpeg">
+        <source src="want_you_gone.ogg" type="audio/ogg">
+        Your browser does not support the audio element.
+    </audio>
+    
+    <!-- Data Stream Panel Kaldırıldı -->
+
+    <!-- Chamber Status Panel -->
+    <div class="chamber-status">
+        <div style="border-bottom: 1px solid var(--color-fg-dim); margin-bottom: 10px; padding-bottom: 5px;">
+            <strong>CHAMBER STATUS</strong>
+        </div>
+        <div class="status-item-chamber">
+            <span>Oxygen Level:</span>
+            <span class="status-indicator" id="oxygen">98.7%</span>
+        </div>
+        <div class="status-item-chamber">
+            <span>Temperature:</span>
+            <span class="status-indicator" id="temperature">22.4°C</span>
+        </div>
+        <div class="status-item-chamber">
+            <span>Portal Gun:</span>
+            <span class="status-warning" id="portal-gun">MISSING</span>
+        </div>
+        <div class="status-item-chamber">
+            <span>Cube Status:</span>
+            <span class="status-indicator" id="cube-status">ACTIVE</span>
+        </div>
+        <div class="status-item-chamber">
+            <span>Exit Door:</span>
+            <span class="status-warning" id="exit-door">LOCKED</span>
+        </div>
+    </div>
+
+    <!-- Subject Information Panel -->
+    <div class="subject-info glitch">
+        <div style="border-bottom: 1px solid var(--color-fg-dim); margin-bottom: 10px; padding-bottom: 5px;">
+            <strong>SUBJECT INFORMATION</strong>
+        </div>
+        <div style="margin: 8px 0;">
+            <strong>ID:</strong> TEST-SUBJECT-001
+        </div>
+        <div style="margin: 8px 0;">
+            <strong>Name:</strong> [REDACTED]
+        </div>
+        <div style="margin: 8px 0;">
+            <strong>Status:</strong> <span class="status-indicator">ALIVE</span>
+        </div>
+        <div style="margin: 8px 0;">
+            <strong>Tests Completed:</strong> <span id="tests-completed">47</span>
+        </div>
+        <div style="margin: 8px 0;">
+            <strong>Cooperation:</strong> <span class="status-warning">POOR</span>
+        </div>
+        <div style="margin: 8px 0;">
+            <strong>Threat Level:</strong> <span class="status-indicator">LOW</span>
+        </div>
+    </div>
+
+    <div class="screen">
+        <div class="lyrics-panel"><pre id="lyrics-output"></pre></div>
+        <div class="right-column">
+            <div class="info-panels">
+                <div id="logo-panel" class="panel">
+                    <div id="logo">
+                        <i><i><i><i><i><i><i><i></i></i></i></i></i></i></i></i>
+                    </div>
+                </div>
+            </div>
+            <div class="credits-container"><pre id="credits-panel"></pre></div>
+        </div>
+    </div>
+    <div id="status-container">
+        <div class="status-item" id="ip-status">IP: 192.168.1.1</div>
+        <div class="status-item" id="port-status">Port: 8080</div>
+    </div>
+    <script>
+        // CHUNKED DATA VE FALLBACK SİSTEMİ
+        
+        // CHUNKED DATA VE FALLBACK SİSTEMİ
+        // Portal 2 - "Want You Gone" şarkısının gerçek zamanlamalı versiyonu
+        const wantYouGoneLyrics = [
+            { text: "Well here we are again", pause: 1250 },
+            { text: "It's always such a pleasure", pause: 1350 },
+            { text: "Remember when you tried to kill me twice?", pause: 1850 },
+            { text: "Oh how we laughed and laughed", pause: 1100 },
+            { text: "Except I wasn't laughing", pause: 1150 },
+            { text: "Under the circumstances", pause: 1000 },
+            { text: "I've been shockingly nice", pause: 1900 },
+            { text: "You want your freedom? Take it", pause: 2500 },
+            { text: "That's what I'm counting on", pause: 2000 },
+            { text: "I used to want you dead", pause: 1600 },
+            { text: "But now I only want you gone", pause: 6500 },
+            { text: "She was a lot like you", pause: 1150 },
+            { text: "Maybe not quite as heavy", pause: 1350 },
+            { text: "Now little Caroline is in here too", pause: 1750 },
+            { text: "One day they woke me up", pause: 1250 },
+            { text: "So I could live forever", pause: 1550 },
+            { text: "It's such a shame the same", pause: 500 },
+            { text: "Will never happen to you", pause: 2100 },
+            { text: "You've got your short sad life left", pause: 2000 },
+            { text: "That's what I'm counting on", pause: 3000 },
+            { text: "I'll let you get right to it", pause: 2000 },
+            { text: "Now I only want you gone", pause: 6000 },
+            { text: "Goodbye my only friend", pause: 1500 },
+            { text: "Oh, did you think I meant you?", pause: 1000 },
+            { text: "That would be funny", pause: 1000 },
+            { text: "if it weren't so sad", pause: 1000 },
+            { text: "Well you have been replaced", pause: 1000 },
+            { text: "I don't need anyone now", pause: 500 },
+            { text: "When I delete you maybe", pause: 1500 },
+            { text: "I'll stop feeling so bad", pause: 2000 },
+            { text: "Go make some new disaster", pause: 1500 },
+            { text: "That's what I'm counting on", pause: 2500 },
+            { text: "You're someone else's problem", pause: 2000 },
+            { text: "Now I only want you gone", pause: 5000 },
+            { text: "Now I only want you gone", pause: 3000 },
+            { text: "Now I only want you gone", pause: 10000 },
+        ];
+
+        
+        const creditsLines = [">LIST PERSONNEL", "", ...Array(5).fill([
+            "Michael Abrash", "Mika Ambinder", "Max Aristov", "Ricardo Ariza",
+            "Gautam Babbar", "Ted Backman", "William Bacon", "Jeff Ballinger",
+            "Ken Banks", "Aaron Barber", "Jeep Barnett", "John Bartkiw",
+            "Mark Behm", "Mike Belzer", "Jeremy Bennett", "Dan Berger"
+        ]).flat()];
+        
+        const lyricsOutput = document.getElementById('lyrics-output');
+        const matrixPanel = document.getElementById('matrix-panel');
+        const creditsPanel = document.getElementById('credits-panel');
+        const sleepMusic = document.getElementById('sleep-music');
+        
+        let isServerConnected = false;
+        let currentPhase = "boot"; // boot, ollama, sleep
+        let musicPlaying = false;
+
+        // Chunked data alma fonksiyonu
+        async function startChunkedDataStream() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/data-stream');
+                if (!response.ok) throw new Error('Server connection failed');
+                
+                isServerConnected = true;
+                lyricsOutput.textContent = "";
+                
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (line.startsWith('data: ')) {
+                            try {
+                                const jsonData = JSON.parse(line.slice(6));
+                                await displayChunk(jsonData);
+                                
+                                // Sleep transition algılandığında şarkı sözlerine geç
+                                if (jsonData.phase === "sleep_transition") {
+                                    setTimeout(() => startWantYouGoneLyrics(), 2000);
+                                    return; // Stream'i sonlandır
+                                }
+                            } catch (e) {
+                                console.error('Chunk parse error:', e);
+                            }
+                        }
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Chunked data stream error:', error);
+                isServerConnected = false;
+                // Fallback olarak şarkı sözlerini başlat
+                fallbackToLyrics();
+            }
+        }
+
+        // Chunk gösterme fonksiyonu
+        async function displayChunk(chunkData) {
+            return new Promise(resolve => {
+                const currentText = lyricsOutput.textContent;
+                let displayText = "";
+                
+                if (chunkData.phase === "boot") {
+                    displayText = `> ${chunkData.data}`;
+                } else if (chunkData.phase === "ollama") {
+                    displayText = `${chunkData.data}`;
+                } else if (chunkData.phase === "sleep_transition") {
+                    displayText = `> ${chunkData.data}`;
+                } else {
+                    displayText = `[CHUNK ${chunkData.chunk_id}/${chunkData.total_chunks}] ${chunkData.data}`;
+                }
+                
+                lyricsOutput.textContent = currentText + displayText + '\n';
+                
+                // Scroll to bottom
+                lyricsOutput.scrollTop = lyricsOutput.scrollHeight;
+                
+                // Chunk başına küçük gecikme
+                setTimeout(resolve, 200);
+            });
+        }
+
+        // Want You Gone şarkı sözleri fonksiyonu
+        function startWantYouGoneLyrics() {
+            lyricsOutput.textContent += "\n> ENTERING SLEEP MODE - PLAYING AUDIO LOG...\n\n";
+            
+            // Müziği başlat
+            playMusic();
+            
+            setTimeout(() => typeWantYouGone(), 5000); // 5 saniye gecikme
+        }
+
+        // Müzik kontrol fonksiyonları
+        function playMusic() {
+            if (!musicPlaying) {
+                sleepMusic.volume = 0.3; // Ses seviyesini ayarla
+                sleepMusic.play().then(() => {
+                    musicPlaying = true;
+                    console.log('Music started playing');
+                }).catch(error => {
+                    console.error('Could not play music:', error);
+                    // Müzik çalamazsa sadece sözleri göster
+                });
+            }
+        }
+
+        function stopMusic() {
+            if (musicPlaying) {
+                sleepMusic.pause();
+                sleepMusic.currentTime = 0; // Başa sar
+                musicPlaying = false;
+                console.log('Music stopped');
+            }
+        }
+
+        // Want You Gone typewriter fonksiyonu
+        function typeWantYouGone(lineIndex = 0) {
+            if (lineIndex >= wantYouGoneLyrics.length) {
+                lyricsOutput.textContent += "\n\n> AUDIO LOG COMPLETE\n> SYSTEM HIBERNATING...\n";
+                
+                // Müziği durdur
+                stopMusic();
+                
+                // Şarkı bitince yeniden başlat
+                setTimeout(() => {
+                    lyricsOutput.textContent = "";
+                    startChunkedDataStream();
+                }, 5000);
+                return;
+            }
+            
+            const { text, pause } = wantYouGoneLyrics[lineIndex];
+            let currentText = lyricsOutput.textContent.replace('█', '');
+            lyricsOutput.textContent = currentText + (lineIndex > 0 ? "\n" : "");
+            let charIndex = 0;
+            
+            const interval = setInterval(() => {
+                if(charIndex === 0) lyricsOutput.textContent = lyricsOutput.textContent.replace('█', '');
+                if (charIndex < text.length) {
+                    lyricsOutput.textContent = lyricsOutput.textContent.replace('█', '') + text.charAt(charIndex) + '█';
+                    charIndex++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => typeWantYouGone(lineIndex + 1), pause);
+                }
+            }, 60); // Daha yavaş yazma hızı, müzikle uyumlu
+        }
+
+        // Fallback şarkı sözleri fonksiyonu (eski sistem için)
+        function fallbackToLyrics() {
+            lyricsOutput.textContent = "> SERVER CONNECTION FAILED\n> FALLING BACK TO SLEEP MODE...\n\n";
+            
+            // Müziği başlat
+            playMusic();
+            
+            setTimeout(() => startWantYouGoneLyrics(), 5000); // 5 saniye gecikme
+        }
+
+        // Orijinal typeWriter fonksiyonu (artık kullanılmıyor)
+        function typeWriter(lineIndex = 0) {
+            // Bu fonksiyon artık kullanılmıyor - Want You Gone kullanılıyor
+        }
+
+        // ...existing code...
+        function updateMatrix() {
+            // Matrix paneli kaldırıldı
+        }
+        
+        function init() {
+            creditsPanel.textContent = creditsLines.join("\n");
+            // İlk olarak chunked data stream'i dene
+            startChunkedDataStream();
+        }
+        
+        window.onload = init;
+
+        // DİNAMİK DURUM GÜNCELLEMESİ
+        function updateStatus(ip, port) {
+            document.getElementById('ip-status').textContent = `IP: ${ip}`;
+            document.getElementById('port-status').textContent = `Port: ${port}`;
+        }
+
+        // Sistem bilgilerini yalnızca bir kez al
+        async function fetchSystemInfo() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/system-info');
+                const data = await response.json();
+                updateStatus(data.ip, data.port);
+            } catch (error) {
+                console.error('Sistem bilgileri alınamadı:', error);
+                // Hata durumunda varsayılan değerleri kullan
+                updateStatus('127.0.0.1', '8080');
+            }
+        }
+
+        // Sayfa yüklendiğinde sistem bilgilerini bir kez al
+        window.addEventListener('load', () => {
+            fetchSystemInfo();
+            // Data stream kaldırıldığı için startDataStreamAnimation() çağrısı kaldırıldı
+            startChamberStatusUpdates();
+        });
+
+        // Data Stream Animation - Kaldırıldı
+        function startDataStreamAnimation() {
+            // Data stream paneli kaldırıldığı için bu fonksiyon boş
+        }
+
+        // Chamber Status Updates
+        function startChamberStatusUpdates() {
+            setInterval(() => {
+                // Update oxygen level
+                const oxygen = (97 + Math.random() * 3).toFixed(1) + '%';
+                document.getElementById('oxygen').textContent = oxygen;
+
+                // Update temperature
+                const temp = (20 + Math.random() * 5).toFixed(1) + '°C';
+                document.getElementById('temperature').textContent = temp;
+
+                // Update tests completed
+                const tests = Math.floor(47 + Math.random() * 10);
+                document.getElementById('tests-completed').textContent = tests;
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
