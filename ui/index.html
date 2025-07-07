@@ -91,8 +91,8 @@
             margin-bottom: 10px;
         }
 
-        .credits-container { overflow: hidden; position: relative; }
-        #credits-panel { position: absolute; width: 100%; color: var(--color-fg-dim); will-change: transform; animation: scroll-up 120s linear infinite; }
+        .credits-container { overflow: hidden; position: relative; display: none; }
+        #credits-panel { position: absolute; width: 100%; color: var(--color-fg-dim); will-change: transform; animation: scroll-up 120s linear infinite; display: none; }
         
         @keyframes scroll-up { from { transform: translateY(100%); } to { transform: translateY(-120%); } }
 
@@ -166,6 +166,7 @@
             width: 200px; /* Kare boyut */
             height: 200px; /* Kare boyut */
             margin: 0; /* Sağ üst köşeye taşındı */
+            border-radius: 50%; /* Dairesel panel */
         }
 
         /* Diğer panelleri kaldır */
@@ -188,6 +189,11 @@
             justify-content: space-between;
             align-items: center;
             border: 1px solid var(--color-fg-dim);
+        }
+
+        /* --- APERTURE LOGO PANELİ DAİRE YAPMA --- */
+        #logo-panel {
+            border-radius: 50% !important;
         }
 
         /* --- CPU VE DURUM KUTUSU DÜZENLEMESİ --- */
@@ -330,8 +336,8 @@
 
         .subject-info {
             position: absolute;
-            bottom: 65px;
-            right: 270px;
+            bottom: 280px; /* Chamber status üstüne taşındı */
+            right: 20px; /* Chamber status ile aynı hizada */
             width: 220px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.8);
@@ -367,10 +373,536 @@
                 filter: hue-rotate(0deg);
             }
         }
+
+        /* --- GLaDOS BACKGROUND TEXT --- */
+        .glados-bg-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-mono);
+            font-size: 120px;
+            font-weight: bold;
+            color: rgba(255, 108, 0, 0.25);
+            text-shadow: 0 0 80px rgba(255, 108, 0, 0.3), 0 0 40px rgba(255, 108, 0, 0.2);
+            z-index: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            animation: glados-text-pulse 8s ease-in-out infinite;
+            user-select: none;
+        }
+
+        .glados-bg-text::before {
+            content: "GENETIC LIFEFORM AND";
+            position: absolute;
+            top: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            color: rgba(0, 174, 239, 0.2);
+            text-shadow: 0 0 50px rgba(0, 174, 239, 0.25), 0 0 25px rgba(0, 174, 239, 0.15);
+        }
+
+        .glados-bg-text::after {
+            content: "DISK OPERATING SYSTEM";
+            position: absolute;
+            bottom: -80px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 60px;
+            color: rgba(0, 174, 239, 0.2);
+            text-shadow: 0 0 50px rgba(0, 174, 239, 0.25), 0 0 25px rgba(0, 174, 239, 0.15);
+        }
+
+        @keyframes glados-text-pulse {
+            0%, 100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            25% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(1.02);
+            }
+            50% {
+                opacity: 1.2;
+                transform: translate(-50%, -50%) scale(0.98);
+            }
+            75% {
+                opacity: 0.9;
+                transform: translate(-50%, -50%) scale(1.01);
+            }
+        }
+
+        /* --- PARTICLE EFFECTS --- */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 108, 0, 0.8);
+            border-radius: 50%;
+            z-index: 1;
+            pointer-events: none;
+            animation: particle-float 8s linear infinite;
+        }
+
+        .particle.blue {
+            background: rgba(0, 174, 239, 0.8);
+            animation-duration: 6s;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* --- TOAST NOTIFICATIONS --- */
+        .notification-icon {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 108, 0, 0.8);
+            border: 2px solid var(--portal-orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            font-size: 20px;
+            color: #000;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255, 108, 0, 0.5);
+        }
+
+        .notification-icon:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(255, 108, 0, 0.8);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF0000;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .toast-container {
+            position: fixed;
+            bottom: 80px; /* İkon üstünde */
+            left: 20px;
+            z-index: 90;
+            max-width: 350px;
+            display: none; /* Başlangıçta gizli */
+        }
+
+        .toast {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid var(--portal-orange);
+            border-left: 4px solid var(--portal-orange);
+            color: var(--color-fg);
+            padding: 15px;
+            margin-bottom: 10px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            animation: toast-slide-in 0.5s ease-out;
+            box-shadow: 0 0 20px rgba(255, 108, 0, 0.3);
+        }
+
+        .toast.warning {
+            border-color: var(--portal-blue);
+            border-left-color: var(--portal-blue);
+            box-shadow: 0 0 20px rgba(0, 174, 239, 0.3);
+        }
+
+        .toast.success {
+            border-color: #00FF00;
+            border-left-color: #00FF00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+
+        @keyframes toast-slide-in {
+            from {
+                transform: translateX(-100%); /* Sol taraftan gelecek */
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes toast-slide-out {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%); /* Sol tarafa gidecek */
+                opacity: 0;
+            }
+        }
+
+        /* --- NOTIFICATION PANEL --- */
+        .notification-panel {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            width: 350px;
+            max-height: 400px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid var(--color-fg-dim);
+            border-left: 4px solid var(--portal-orange);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--color-fg);
+            z-index: 80;
+            box-shadow: 0 0 20px rgba(255, 108, 0, 0.3);
+            display: none; /* Başlangıçta gizli */
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .notification-panel.show {
+            display: block;
+            transform: translateY(0);
+        }
+
+        .notification-header {
+            padding: 10px 15px;
+            background: rgba(255, 108, 0, 0.2);
+            border-bottom: 1px solid var(--color-fg-dim);
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notification-content {
+            padding: 10px;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        .notification-item {
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(255, 108, 0, 0.1);
+            border-left: 3px solid var(--portal-orange);
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .notification-item.warning {
+            border-left-color: var(--portal-blue);
+            background: rgba(0, 174, 239, 0.1);
+        }
+
+        .notification-item.success {
+            border-left-color: #00FF00;
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .notification-time {
+            font-size: 10px;
+            color: var(--color-fg-dim);
+            margin-bottom: 4px;
+        }
+
+        .notification-close {
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--color-fg-dim);
+        }
+
+        .notification-close:hover {
+            color: var(--color-fg);
+        }
+
+        /* --- CAMERA BOX --- */
+        .camera-container {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 750px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid var(--color-fg-dim);
+            border-top: none;
+            border-radius: 0 0 10px 10px;
+            z-index: 60;
+            transition: transform 0.4s ease;
+            transform: translateX(-50%) translateY(-310px); /* Başlangıçta gizli */
+        }
+
+        .camera-container.open {
+            transform: translateX(-50%) translateY(0); /* Açık pozisyon */
+        }
+
+        .camera-handle {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--portal-orange), var(--portal-blue));
+            border-radius: 0 0 15px 15px;
+            cursor: pointer;
+            border: 1px solid var(--color-fg-dim);
+            border-top: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(255, 108, 0, 0.3);
+        }
+
+        .camera-handle:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 108, 0, 0.6);
+        }
+
+        .camera-handle::before {
+            content: "⋮";
+            color: #000;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .camera-header {
+            padding: 15px 20px;
+            background: rgba(255, 108, 0, 0.2);
+            border-bottom: 1px solid var(--color-fg-dim);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--color-fg);
+            text-align: center;
+        }
+
+        .camera-content {
+            padding: 20px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-viewport {
+            width: 400px;
+            height: 180px;
+            background: #000;
+            border: 2px solid var(--color-fg-dim);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .camera-static {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent 0px,
+                rgba(255, 255, 255, 0.03) 1px,
+                rgba(255, 255, 255, 0.03) 2px,
+                transparent 3px
+            );
+            animation: static-noise 0.1s linear infinite;
+        }
+
+        @keyframes static-noise {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+
+        .camera-text {
+            color: var(--color-fg-dim);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .camera-btn {
+            background: rgba(255, 108, 0, 0.2);
+            border: 1px solid var(--portal-orange);
+            color: var(--color-fg);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 8px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .camera-btn:hover {
+            background: rgba(255, 108, 0, 0.4);
+            box-shadow: 0 0 10px rgba(255, 108, 0, 0.3);
+        }
+
+        .camera-btn.active {
+            background: rgba(255, 108, 0, 0.6);
+        }
+
+        /* --- TERMINAL --- */
+        .terminal-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.95);
+            border: 1px solid var(--color-fg-dim);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: var(--color-fg);
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .terminal-header {
+            padding: 8px 12px;
+            background: rgba(255, 108, 0, 0.2);
+            border-bottom: 1px solid var(--color-fg-dim);
+            font-weight: bold;
+        }
+
+        .terminal-output {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        .terminal-input-line {
+            padding: 8px 10px;
+            border-top: 1px solid var(--color-fg-dim);
+            display: flex;
+            align-items: center;
+            background: rgba(255, 108, 0, 0.1);
+        }
+
+        .terminal-prompt {
+            color: var(--portal-orange);
+            margin-right: 5px;
+        }
+
+        .terminal-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--color-fg);
+            font-family: var(--font-mono);
+            font-size: 14px;
+        }
+
+        .terminal-cursor {
+            animation: blink 1s infinite;
+        }
     </style>
 </head>
 <body>
     <div class="scanline"></div>
+    
+    <!-- GLaDOS Background Text -->
+    <div class="glados-bg-text">GLaDOS</div>
+    
+    <!-- Camera Container -->
+    <div class="camera-container" id="camera-container">
+        <div class="camera-header">
+            GLaDOS SURVEILLANCE SYSTEM
+        </div>
+        <div class="camera-content">
+            <div class="camera-viewport">
+                <div class="camera-static"></div>
+                <div class="camera-text">
+                    CAMERA FEED<br>
+                    TEST CHAMBER 19<br>
+                    <span style="color: var(--portal-orange);">● REC</span>
+                </div>
+            </div>
+            <div class="camera-controls">
+                <button class="camera-btn active" onclick="switchCamera(1)">CAM 1</button>
+                <button class="camera-btn" onclick="switchCamera(2)">CAM 2</button>
+                <button class="camera-btn" onclick="switchCamera(3)">CAM 3</button>
+            </div>
+        </div>
+        <div class="camera-handle" id="camera-handle" onclick="toggleCamera()"></div>
+    </div>
+
+    <!-- Notification Icon -->
+    <div class="notification-icon" id="notification-icon" onclick="toggleNotifications()">
+        <span>🔔</span>
+        <div class="notification-badge" id="notification-badge" style="display: none;">0</div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notification-panel">
+        <div class="notification-header">
+            <span>GLaDOS NOTIFICATIONS</span>
+            <span class="notification-close" onclick="toggleNotifications()">×</span>
+        </div>
+        <div class="notification-content" id="notification-content">
+            <!-- Bildirimler buraya dinamik olarak eklenecek -->
+        </div>
+    </div>
+
+    <!-- Terminal Panel -->
+    <div class="terminal-panel">
+        <div class="terminal-header">GLaDOS TERMINAL v2.0 - APERTURE SCIENCE</div>
+        <div class="terminal-output" id="terminal-output">Welcome to GLaDOS Terminal System
+Type 'help' for available commands.
+
+GLaDOS:> </div>
+        <div class="terminal-input-line">
+            <span class="terminal-prompt">GLaDOS:></span>
+            <input type="text" class="terminal-input" id="terminal-input" placeholder="Enter command..." autocomplete="off">
+        </div>
+    </div>
     
     <!-- Audio element for sleep mode music -->
     <audio id="sleep-music" loop preload="auto">
@@ -443,7 +975,7 @@
                     </div>
                 </div>
             </div>
-            <div class="credits-container"><pre id="credits-panel"></pre></div>
+            <div class="credits-container" style="display: none;"><pre id="credits-panel"></pre></div>
         </div>
     </div>
     <div id="status-container">
@@ -495,12 +1027,7 @@
         ];
 
         
-        const creditsLines = [">LIST PERSONNEL", "", ...Array(5).fill([
-            "Michael Abrash", "Mika Ambinder", "Max Aristov", "Ricardo Ariza",
-            "Gautam Babbar", "Ted Backman", "William Bacon", "Jeff Ballinger",
-            "Ken Banks", "Aaron Barber", "Jeep Barnett", "John Bartkiw",
-            "Mark Behm", "Mike Belzer", "Jeremy Bennett", "Dan Berger"
-        ]).flat()];
+        const creditsLines = []; // Liste kaldırıldı
         
         const lyricsOutput = document.getElementById('lyrics-output');
         const matrixPanel = document.getElementById('matrix-panel');
@@ -669,7 +1196,7 @@
         }
         
         function init() {
-            creditsPanel.textContent = creditsLines.join("\n");
+            // Credits paneli kaldırıldı
             // İlk olarak chunked data stream'i dene
             startChunkedDataStream();
         }
@@ -700,6 +1227,7 @@
             fetchSystemInfo();
             // Data stream kaldırıldığı için startDataStreamAnimation() çağrısı kaldırıldı
             startChamberStatusUpdates();
+            initializeNewSystems();
         });
 
         // Data Stream Animation - Kaldırıldı
@@ -723,6 +1251,322 @@
                 document.getElementById('tests-completed').textContent = tests;
             }, 5000);
         }
+
+        // PARTICLE EFFECTS
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = Math.random() > 0.5 ? 'particle' : 'particle blue';
+            
+            // Random horizontal position
+            particle.style.left = Math.random() * 100 + 'vw';
+            
+            document.body.appendChild(particle);
+            
+            // Remove particle after animation
+            setTimeout(() => {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+            }, 8000);
+        }
+
+        // Start particle system
+        function startParticleSystem() {
+            setInterval(createParticle, 800);
+        }
+
+        // TIMER SYSTEM - REMOVED
+
+        // TOAST NOTIFICATION SYSTEM
+        let notificationCount = 0;
+        let isNotificationPanelOpen = false;
+        let isCameraOpen = false;
+        
+        // CAMERA SYSTEM
+        function toggleCamera() {
+            const container = document.getElementById('camera-container');
+            isCameraOpen = !isCameraOpen;
+            
+            if (isCameraOpen) {
+                container.classList.add('open');
+                showToast('Surveillance system activated. Monitoring in progress.', 'info', 3000);
+            } else {
+                container.classList.remove('open');
+            }
+        }
+
+        function switchCamera(camNumber) {
+            const buttons = document.querySelectorAll('.camera-btn');
+            const cameraText = document.querySelector('.camera-text');
+            
+            // Remove active class from all buttons
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            buttons[camNumber - 1].classList.add('active');
+            
+            // Update camera display
+            const cameraNames = {
+                1: 'TEST CHAMBER 19',
+                2: 'SECURITY CORRIDOR',
+                3: 'NEUROTOXIN CHAMBER'
+            };
+            
+            cameraText.innerHTML = `
+                CAMERA FEED<br>
+                ${cameraNames[camNumber]}<br>
+                <span style="color: var(--portal-orange);">● REC</span>
+            `;
+            
+            showToast(`Switched to Camera ${camNumber}: ${cameraNames[camNumber]}`, 'info', 2000);
+        }
+        
+        function showToast(message, type = 'info', duration = 5000) {
+            // Bildirim paneline ekle
+            addNotificationToPanel(message, type);
+            
+            // Eğer panel açıksa toast gösterme
+            if (isNotificationPanelOpen) return;
+            
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<strong>GLaDOS:</strong> ${message}`;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after duration
+            setTimeout(() => {
+                toast.style.animation = 'toast-slide-out 0.5s ease-out forwards';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 500);
+            }, duration);
+        }
+
+        // NOTIFICATION PANEL SYSTEM
+        function addNotificationToPanel(message, type = 'info') {
+            const notificationContent = document.getElementById('notification-content');
+            const notificationItem = document.createElement('div');
+            const currentTime = new Date().toLocaleTimeString();
+            
+            notificationItem.className = `notification-item ${type}`;
+            notificationItem.innerHTML = `
+                <div class="notification-time">GLaDOS - ${currentTime}</div>
+                <div>${message}</div>
+            `;
+            
+            // En üste ekle
+            notificationContent.insertBefore(notificationItem, notificationContent.firstChild);
+            
+            // Bildirim sayısını artır
+            notificationCount++;
+            updateNotificationBadge();
+            
+            // Maksimum 15 bildirim tut
+            const notifications = notificationContent.children;
+            if (notifications.length > 15) {
+                notificationContent.removeChild(notifications[notifications.length - 1]);
+            }
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notification-badge');
+            if (notificationCount > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = notificationCount > 99 ? '99+' : notificationCount;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notification-panel');
+            const container = document.getElementById('toast-container');
+            
+            isNotificationPanelOpen = !isNotificationPanelOpen;
+            
+            if (isNotificationPanelOpen) {
+                panel.classList.add('show');
+                container.style.display = 'none'; // Toast'ları gizle
+                notificationCount = 0; // Badge'i sıfırla
+                updateNotificationBadge();
+            } else {
+                panel.classList.remove('show');
+                container.style.display = 'block'; // Toast'ları göster
+            }
+        }
+
+        // Başlangıç bildirimleri
+        function initNotificationPanel() {
+            // Başlangıç bildirimleri ekle
+            addNotificationToPanel('GLaDOS systems online. Welcome to Aperture Science.', 'success');
+            addNotificationToPanel('Portal Gun missing from test chamber. Subject cooperation required.', 'warning');
+            addNotificationToPanel('Test Chamber initialized successfully. Begin testing protocol.', 'info');
+        }
+
+        function toggleNotificationPanel() {
+            // Eski fonksiyon - artık kullanılmıyor
+            toggleNotifications();
+        }
+
+        // TERMINAL SYSTEM
+        const terminalCommands = {
+            help: () => `Available commands:
+status - Show system status
+test - Run diagnostic test
+portal - Portal gun diagnostics
+neurotoxin - Check neurotoxin levels
+cake - Check cake availability
+camera - Access surveillance system
+time - Show current time
+clear - Clear terminal
+reboot - Restart GLaDOS`,
+            
+            status: () => `GLaDOS Status: OPERATIONAL
+Test Subjects: 1 (ALIVE)
+Portal Gun: MISSING
+Neurotoxin: READY
+Cake: THE CAKE IS A LIE`,
+            
+            test: () => {
+                showToast('Running diagnostic test...', 'info');
+                setTimeout(() => showToast('Test completed. Subject cooperation: POOR', 'warning'), 2000);
+                return 'Initiating diagnostic test...';
+            },
+            
+            portal: () => `Portal Gun Status: NOT DETECTED
+Last seen: Test Chamber 19
+Estimated retrieval time: NEVER`,
+            
+            neurotoxin: () => `Neurotoxin levels: 100% READY
+Deployment time: 5 minutes
+Have a nice day!`,
+            
+            cake: () => {
+                showToast('Cake dispensing... ERROR: No cake found', 'warning');
+                return 'The cake is a lie. Always has been.';
+            },
+            
+            camera: () => {
+                if (!isCameraOpen) {
+                    toggleCamera();
+                    return 'Camera system activated. Surveillance mode enabled.';
+                } else {
+                    return 'Camera system already active. Use CAM 1-3 buttons to switch feeds.';
+                }
+            },
+            
+            time: () => new Date().toLocaleString(),
+            
+            clear: () => {
+                document.getElementById('terminal-output').textContent = 'GLaDOS:> ';
+                return '';
+            },
+            
+            reboot: () => {
+                showToast('GLaDOS rebooting... Please stand by', 'info');
+                return 'Rebooting GLaDOS... This may take a while.';
+            }
+        };
+
+        function handleTerminalInput(input) {
+            const output = document.getElementById('terminal-output');
+            const command = input.toLowerCase().trim();
+            
+            // Add command to output
+            output.textContent += input + '\n';
+            
+            if (terminalCommands[command]) {
+                const result = terminalCommands[command]();
+                if (result) {
+                    output.textContent += result + '\n';
+                }
+            } else if (command) {
+                output.textContent += `Command not recognized: ${command}\nType 'help' for available commands.\n`;
+            }
+            
+            output.textContent += '\nGLaDOS:> ';
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Random GLaDOS messages
+        const gladosMessages = [
+            "Please note that we have added a consequence for failure. Any contact with the chamber floor will result in an 'unsatisfactory' mark on your official testing record.",
+            "The Enrichment Center promises to always provide a safe testing environment. In dangerous testing environments, the Enrichment Center promises to always provide useful advice.",
+            "Excellent! You're making good time. Also, that thing you just incinerated? That was my only link to the outside world.",
+            "You are doing very well! Also, I'm not kidding about the neurotoxin.",
+            "Please be advised that a noticeable taste of blood is not part of any test protocol.",
+            "Remember, the Aperture Science Computer-Aided Enrichment Center computer will never threaten to stab you and, in fact, cannot speak."
+        ];
+
+        function showRandomMessage() {
+            const message = gladosMessages[Math.floor(Math.random() * gladosMessages.length)];
+            const types = ['info', 'warning', 'success'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            showToast(message, type, 8000);
+        }
+
+        // Initialize new systems
+        function initializeNewSystems() {
+            // Start particle system
+            startParticleSystem();
+            
+            // Initialize notification panel
+            initNotificationPanel();
+            
+            // Terminal input handler
+            const terminalInput = document.getElementById('terminal-input');
+            terminalInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    handleTerminalInput(e.target.value);
+                    e.target.value = '';
+                }
+            });
+            
+            // Show welcome message
+            setTimeout(() => {
+                showToast('GLaDOS systems online. Begin testing.', 'success');
+            }, 2000);
+            
+            // Random messages every 30-60 seconds
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    showRandomMessage();
+                }
+            }, 45000);
+            
+            // Panel dışında tıklandığında kapat
+            document.addEventListener('click', (e) => {
+                const panel = document.getElementById('notification-panel');
+                const icon = document.getElementById('notification-icon');
+                const cameraContainer = document.getElementById('camera-container');
+                
+                if (isNotificationPanelOpen && 
+                    !panel.contains(e.target) && 
+                    !icon.contains(e.target)) {
+                    toggleNotifications();
+                }
+                
+                // Camera dışında tıklandığında kapat
+                if (isCameraOpen && 
+                    !cameraContainer.contains(e.target)) {
+                    toggleCamera();
+                }
+            });
+            
+            // Camera'ya başlangıç bildirimi ekle
+            setTimeout(() => {
+                addNotificationToPanel('Surveillance cameras online. Click handle to access.', 'info');
+            }, 4000);
+        }
+
+        // Sayfa yüklendiğinde yeni sistemleri başlat
+        window.addEventListener('load', () => {
+            initializeNewSystems();
+        });
     </script>
 </body>
 </html>
